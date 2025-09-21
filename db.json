@@ -1,321 +1,101 @@
 {
   "modules": [
     {
-      "id": "3a69",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
+      "id": 1,
+      "name": "Sample Customer Feedback Survey",
+      "description": "A comprehensive customer feedback survey",
+      "status": "Active",
       "surveyJson": {
+        "title": "Customer Feedback Survey",
+        "description": "We value your feedback",
         "pages": [
           {
-            "name": "Name",
+            "name": "page1",
             "elements": [
               {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
+                "type": "rating",
+                "name": "overall_satisfaction",
+                "title": "Overall satisfaction with our service",
+                "category": "Standard",
+                "weight": 5,
+                "assessment_type": [
+                  "Performance"
+                ],
+                "show_result_after_completion": true
               },
               {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
+                "type": "radiogroup",
+                "name": "recommendation",
+                "title": "How likely are you to recommend us?",
+                "choices": [
+                  "Very Likely",
+                  "Likely",
+                  "Neutral",
+                  "Unlikely",
+                  "Very Unlikely"
+                ],
+                "category": "Standard",
+                "weight": 3,
+                "assessment_type": [
+                  "Understanding"
+                ],
+                "show_result_after_completion": true
               },
               {
-                "type": "text",
-                "name": "question2",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question1"
+                "type": "comment",
+                "name": "suggestions",
+                "title": "Any suggestions for improvement?"
               }
             ]
           }
         ]
       },
-      "createdAt": "2025-09-20T09:26:18.677Z",
-      "updatedAt": "2025-09-20T09:27:47.276Z"
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
     },
     {
-      "id": "e119",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
+      "id": "5a8c",
+      "name": "Survey 9/21/2025",
+      "description": "Created on 9/21/2025",
+      "status": "Active",
       "surveyJson": {
         "pages": [
           {
-            "name": "Name",
+            "name": "page1",
             "elements": [
-              {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "question3",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question2",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question1"
-              }
-            ]
-          }
-        ]
-      },
-      "createdAt": "2025-09-20T09:28:08.913Z"
-    },
-    {
-      "id": "729c",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
-      "surveyJson": {
-        "pages": [
-          {
-            "name": "Name",
-            "elements": [
-              {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "question4",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "question3",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question2",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question1"
-              }
-            ]
-          }
-        ]
-      },
-      "createdAt": "2025-09-20T09:30:26.793Z"
-    },
-    {
-      "id": "be97",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
-      "surveyJson": {
-        "pages": [
-          {
-            "name": "Name",
-            "elements": [
-              {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "question4",
-                "title": "Enter your first name:",
-                "isRequired": true
-              },
-              {
-                "type": "text",
-                "name": "question3",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question2",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question1"
-              }
-            ]
-          }
-        ]
-      },
-      "createdAt": "2025-09-20T09:30:33.824Z"
-    },
-    {
-      "id": "46a7",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
-      "surveyJson": {
-        "pages": [
-          {
-            "name": "Name",
-            "elements": [
-              {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "question4",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "question3",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question2",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "text",
-                "name": "question1"
-              }
-            ]
-          }
-        ]
-      },
-      "createdAt": "2025-09-20T09:30:34.549Z"
-    },
-    {
-      "id": "3662",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
-      "surveyJson": {
-        "pages": [
-          {
-            "name": "Name",
-            "elements": [
-              {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
-              },
               {
                 "type": "radiogroup",
                 "name": "question1",
                 "choices": [
-                  "Item 1",
-                  "Item 2",
-                  "Item 3"
+                  "hellos",
+                  "asdas",
+                  "asdsadasdas"
                 ]
               }
             ]
           }
         ]
       },
-      "createdAt": "2025-09-20T09:33:57.312Z"
-    },
-    {
-      "id": "6f8a",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
-      "surveyJson": {
+      "createdAt": "2025-09-21T08:07:06.299Z",
+      "updatedAt": "2025-09-21T08:10:31.422Z",
+      "form_data": {
         "pages": [
           {
-            "name": "Name",
+            "name": "page1",
             "elements": [
-              {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
-              },
               {
                 "type": "radiogroup",
                 "name": "question1",
                 "choices": [
-                  "sss",
-                  "Item 2",
-                  "Item 3"
+                  "hellos",
+                  "asdas",
+                  "asdsadasdas"
                 ]
               }
             ]
           }
         ]
-      },
-      "createdAt": "2025-09-20T09:34:01.033Z"
-    },
-    {
-      "id": "4e15",
-      "name": "Survey 9/20/2025",
-      "description": "Created on 9/20/2025",
-      "status": "draft",
-      "surveyJson": {
-        "pages": [
-          {
-            "name": "Name",
-            "elements": [
-              {
-                "type": "text",
-                "name": "FirstName",
-                "title": "Enter your first name:"
-              },
-              {
-                "type": "text",
-                "name": "LastName",
-                "title": "Enter your last name:"
-              },
-              {
-                "type": "radiogroup",
-                "name": "question1",
-                "choices": [
-                  "sss",
-                  "ssss",
-                  "Item 3"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "createdAt": "2025-09-20T09:34:02.713Z"
+      }
     }
   ]
 }
