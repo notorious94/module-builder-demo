@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect,  useRef, useState } from "react";
 import { SurveyCreatorComponent, SurveyCreator } from "survey-creator-react";
 import { setLicenseKey } from "survey-core";
 // CSS
@@ -11,9 +11,9 @@ import "survey-creator-core/survey-creator-core.i18n";
 import "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/ext-searchbox";
 
-// ---- Defaults (no TypeScript types) ----
 const defaultCreatorOptions = {
   autoSaveEnabled: true,
+  autoSaveDelay: 1000,
 };
 
 const defaultJson = {
@@ -29,23 +29,18 @@ const defaultJson = {
 };
 
 /**
- * Plain React JS version of SurveyCreatorWidget
- *
- * Props:
- * - json?: object                 // initial survey JSON
- * - options?: object              // Survey Creator options
- * - surveyData?: { id, surveyJson } // when editing an existing survey
- * - onSave?: Function             // optional callback after successful save
- * - onBack?: Function             // optional callback for back button navigation
- * - apiService?: { createSurvey, updateSurvey } // injected API service
- * - licenseKey?: string           // SurveyJS Creator license key (optional)
+ * Auto-save always enabled with proper ID tracking
  */
 export default function AddModule(props) {
   const { json, options, surveyData, onSave, onBack, apiService, licenseKey } = props;
 
   const [creator, setCreator] = useState(null);
+  const [saveStatus, setSaveStatus] = useState('');
+  const [currentModuleId, setCurrentModuleId] = useState(surveyData?.id || null);
   const initialJsonRef = useRef(null);
   const manualSaveRef = useRef(false);
+  const isSavingRef = useRef(false);
+  const lastSavedContentRef = useRef('');
 
   // Set license key once (if provided)
   useEffect(() => {
@@ -53,7 +48,6 @@ export default function AddModule(props) {
       try {
         setLicenseKey(licenseKey);
       } catch (e) {
-        // noop if key is invalid/undefined
         console.warn("SurveyJS license key error:", e);
       }
     }
@@ -63,8 +57,8 @@ export default function AddModule(props) {
   if (!initialJsonRef.current) {
     if (json) {
       initialJsonRef.current = json;
-    } else if (surveyData && surveyData.surveyJson) {
-      initialJsonRef.current = surveyData.surveyJson;
+    } else if (surveyData && (surveyData.surveyJson || surveyData.form_data)) {
+      initialJsonRef.current = surveyData.surveyJson || surveyData.form_data;
     } else {
       try {
         const savedJson = typeof window !== "undefined" && window.localStorage.getItem("survey-json");
@@ -82,50 +76,109 @@ export default function AddModule(props) {
 
       // Seed the designer with initial JSON
       try {
-        instance.text = JSON.stringify(initialJsonRef.current || defaultJson);
+        const initialContent = JSON.stringify(initialJsonRef.current || defaultJson);
+        instance.text = initialContent;
+        lastSavedContentRef.current = initialContent;
       } catch (_) {
-        instance.text = JSON.stringify(defaultJson);
+        const defaultContent = JSON.stringify(defaultJson);
+        instance.text = defaultContent;
+        lastSavedContentRef.current = defaultContent;
       }
 
-      // Define save behavior (mirrors original logic)
+      // Save behavior with proper ID tracking
       instance.saveSurveyFunc = async (saveNo, callback) => {
-        console.log("Save triggered with saveNo:", saveNo, "Manual save:", manualSaveRef.current);
+        // Prevent concurrent saves
+        if (isSavingRef.current) {
+          console.log('Save already in progress, skipping...');
+          callback(saveNo, true);
+          return;
+        }
+
+        const currentContent = JSON.stringify(instance.JSON);
+        
+        // Skip save if content hasn't actually changed (except for manual saves)
+        if (currentContent === lastSavedContentRef.current && !manualSaveRef.current) {
+                callback(saveNo, true);
+          return;
+        }
+
+        isSavingRef.current = true;
+     
+        setSaveStatus('Saving...');
+        
         try {
           const surveyJson = instance.JSON;
 
-          if (surveyData && surveyData.id && apiService?.updateSurvey) {
-            // Update existing survey
-            await apiService.updateSurvey(surveyData.id, { surveyJson });
+          // Validate surveyJson
+          if (!surveyJson || Object.keys(surveyJson).length === 0) {
+            throw new Error('Survey data is empty');
+          }
+
+          let result;
+          
+          if (currentModuleId && apiService?.updateSurvey) {
+    
+            result = await apiService.updateSurvey(currentModuleId, { 
+              surveyJson: surveyJson,
+            });
+            setSaveStatus('Updated successfully!');
+            
           } else if (apiService?.createSurvey) {
-            // Create new survey
+            // CREATE new module and get ID
             const surveyName = surveyJson.title || `Survey ${new Date().toLocaleDateString()}`;
-            await apiService.createSurvey({
+            result = await apiService.createSurvey({
               name: surveyName,
               description: `Created on ${new Date().toLocaleDateString()}`,
-              status: "draft",
-              surveyJson,
+              status: "Active",
+              surveyJson: surveyJson,
             });
+            
+            // CRITICAL: Store the new module ID for all future saves
+            if (result && result.id) {
+              setCurrentModuleId(result.id);
+            }
+            
+            setSaveStatus('Created successfully!');
+          } else {
+            throw new Error('No API service available');
           }
+
+          // Update last saved content
+          lastSavedContentRef.current = currentContent;
 
           // Backup to localStorage
           try {
             if (typeof window !== "undefined") {
               window.localStorage.setItem("survey-json", instance.text);
             }
-          } catch (_) {}
+          } catch (e) {
+            console.warn('LocalStorage save failed:', e);
+          }
 
           callback(saveNo, true);
+            
+          // Clear save status after 2 seconds
+          setTimeout(() => setSaveStatus(''), 2000);
           
-          // Only trigger navigation on manual save, not auto save
+          // Only trigger navigation callback on manual save
           if (manualSaveRef.current && typeof onSave === "function") {
-            onSave();
+            setTimeout(() => {
+              onSave(result);
+            }, 1000);
           }
           
           // Reset the manual save flag
           manualSaveRef.current = false;
+          
         } catch (error) {
-          console.error("Failed to save survey:", error);
-          try { callback(saveNo, false); } catch (_) {}
+          console.error("=== SAVE FAILED ===", error);
+          setSaveStatus(`Save failed: ${error.message}`);
+          setTimeout(() => setSaveStatus(''), 5000);
+          try { 
+            callback(saveNo, false); 
+          } catch (_) {}
+        } finally {
+          isSavingRef.current = false;
         }
       };
 
@@ -146,7 +199,7 @@ export default function AddModule(props) {
 
       setCreator(instance);
     }
-  }, [creator, options, onSave, apiService, surveyData]);
+  }, [creator, options, onSave, apiService, currentModuleId]);
 
   // Cleanup event listeners
   useEffect(() => {
@@ -156,6 +209,8 @@ export default function AddModule(props) {
       }
     };
   }, [creator]);
+
+
 
   return (
     <div style={{ height: "100vh", width: "100%", display: "flex", flexDirection: "column" }}>
@@ -196,14 +251,40 @@ export default function AddModule(props) {
             fontWeight: "600", 
             color: "#262626" 
           }}>
-            {surveyData ? `Edit Survey: ${surveyData.name || 'Unnamed Survey'}` : 'Create New Survey'}
+            {currentModuleId ? `Edit Survey (ID: ${currentModuleId})` : 'Create New Survey'}
           </h1>
+          
+         
+        </div>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {saveStatus && (
+            <span style={{ 
+              color: saveStatus.includes('failed') ? '#ff4d4f' : '#52c41a',
+              fontSize: "14px",
+              fontWeight: "500"
+            }}>
+              {saveStatus}
+            </span>
+          )}
+          
+         
         </div>
       </div>
       
       {/* Survey Creator */}
       <div style={{ flex: 1, overflow: "hidden" }}>
-        {creator ? <SurveyCreatorComponent creator={creator} /> : null}
+        {creator ? <SurveyCreatorComponent creator={creator} /> : (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '100%',
+            color: '#666'
+          }}>
+            Loading Survey Creator...
+          </div>
+        )}
       </div>
     </div>
   );
